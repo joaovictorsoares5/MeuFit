@@ -1,0 +1,289 @@
+git remote add origin https://github.com/joaovictorsoares5/MeuFit.git
+ git branch -M main 
+git push -u origin main<section id="loginSection">
+  <h3>Entrar</h3>
+  <input type="text" id="username" placeholder="Nome" />
+  <input type="password" id="password" placeholder="Senha" />
+  <button onclick="login()">Acessar</button>
+</section>
+<section id="homeSection">
+  <h3>Bem-vindo ao MeuFit!</h3>
+  <p>Seu espaço de treino inteligente 💪</p>
+  <button onclick="loadSection('chat.html')">Falar com Didi</button>
+  <button onclick="loadSection('treino.html')">Ver Treinos</button>
+</section>
+<section id="chatSection">
+  <h3>Didi 🤖</h3>
+  <div id="chatBox" class="chat-box"></div>
+  <input type="text" id="userMessage" placeholder="Digite sua pergunta..." />
+  <button onclick="sendMessage()">Enviar</button>
+</section>
+<section id="treinoSection">
+  <h3>🏠 Treino Caseiro</h3>
+  <div class="treino-item" onclick="toggleDone(this)">
+    <h4>1️⃣ Agachamento com cadeira</h4>
+    <p>3x15 repetições. Use uma cadeira para suporte.</p>
+  </div>
+  <div class="treino-item" onclick="toggleDone(this)">
+    <h4>2️⃣ Flexão de braço com pano</h4>
+    <p>3x12 repetições. Apoie os joelhos em um pano.</p>
+  </div>
+  <div class="treino-item" onclick="toggleDone(this)">
+    <h4>3️⃣ Prancha com pano</h4>
+    <p>3x30 segundos. Mantenha corpo reto.</p>
+  </div>
+  <div class="treino-item" onclick="toggleDone(this)">
+    <h4>4️⃣ Elevação de pernas na cadeira</h4>
+    <p>3x12 repetições. Sente-se na ponta da cadeira.</p>
+  </div>
+  <div class="treino-item" onclick="toggleDone(this)">
+    <h4>5️⃣ Corrida parada com pano</h4>
+    <p>3x30 segundos. Movimente os pés como se corresse.</p>
+  </div>
+</section>
+function loadSection(file) {
+  fetch(file)
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('mainContent').innerHTML = html;
+    });
+}
+
+// LOGIN
+function login() {
+  const user = document.getElementById('username').value;
+  const pass = document.getElementById('password').value;
+  if(user && pass) {
+    localStorage.setItem('logged', true);
+    loadSection('home.html');
+    document.getElementById('nav').style.display = 'flex';
+  } else alert('Digite nome e senha para continuar');
+}
+
+// LOGOUT
+function logout() {
+  localStorage.removeItem('logged');
+  loadSection('login.html');
+  document.getElementById('nav').style.display = 'none';
+}
+
+// Chat Didi
+function sendMessage() {
+  const input = document.getElementById('userMessage');
+  const msg = input.value.trim();
+  if(!msg) return;
+
+  const chatBox = document.getElementById('chatBox');
+
+  const userDiv = document.createElement('div');
+  userDiv.className = 'message user';
+  userDiv.innerText = msg;
+  chatBox.appendChild(userDiv);
+
+  input.value = '';
+  chatBox.scrollTop = chatBox.scrollHeight;
+
+  const botDiv = document.createElement('div');
+  botDiv.className = 'message bot';
+  botDiv.innerText = generateResponse(msg);
+  chatBox.appendChild(botDiv);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function generateResponse(msg) {
+  msg = msg.toLowerCase();
+  if(msg.includes('treino')) return 'Você quer ver seus treinos? Clique em Treino 🏋️';
+  if(msg.includes('forte') || msg.includes('musculo')) return 'Para ganhar músculos, pratique os exercícios regularmente e mantenha alimentação equilibrada.';
+  if(msg.includes('oi') || msg.includes('olá')) return 'Oi! Eu sou a Didi 🤖, sua assistente de treinos!';
+  return 'Desculpe, não entendi. Pode reformular?';
+}
+
+// Marcar treino como feito
+function toggleDone(element) {
+  element.classList.toggle('done');
+}
+
+// Inicialização
+if(!localStorage.getItem('logged')) {
+  loadSection('login.html');
+  document.getElementById('nav').style.display = 'none';
+} else {
+  loadSection('home.html');
+  document.getElementById('nav').style.display = 'flex';
+}<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MeuFit</title>
+  <style>
+    body {margin:0;font-family:Arial,sans-serif;background-color:#f9f9f9;color:#222;display:flex;justify-content:center;align-items:center;height:100vh;}
+    .app {width:100%;max-width:420px;height:100vh;display:flex;flex-direction:column;border-radius:15px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,0.2);background-color:#fff;}
+    header {text-align:center;padding:1em;background:linear-gradient(90deg,#ff416c,#ff4b2b);color:#fff;font-weight:bold;font-size:1.2em;}
+    main {flex:1;padding:1em;overflow-y:auto;}
+    .section {display:none;}
+    input {width:90%;padding:0.7em;margin:0.5em 0;border:1px solid #ccc;border-radius:8px;}
+    button {width:95%;padding:0.8em;margin-top:0.5em;background-color:#ff416c;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:bold;}
+    button:hover{opacity:0.85;}
+    .nav {display:flex;justify-content:space-around;border-top:1px solid #ddd;background-color:#fff;padding:0.5em 0;}
+    .nav button {background-color:transparent;color:#555;border:none;font-weight:bold;transition:color 0.3s;}
+    .nav button.active {color:#ff416c;}
+    .message {margin:0.5em 0;padding:0.7em;border-radius:12px;max-width:80%;word-wrap:break-word;}
+    .user {background-color:#ff416c;color:#fff;align-self:flex-end;}
+    .bot {background-color:#eee;align-self:flex-start;}
+    .chat-box {display:flex;flex-direction:column;max-height:60vh;overflow-y:auto;}
+    .treino-item {margin:1em 0;padding:1em;border-radius:10px;background-color:#fff0f2;box-shadow:0 2px 5px rgba(0,0,0,0.1);}
+    .treino-item.done {background-color:#d4edda;text-decoration:line-through;}
+    h4 {margin-top:0.5em;}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>MeuFit</header>
+    <main>
+      <!-- LOGIN -->
+      <section class="section" id="loginSection">
+        <h3>Entrar</h3>
+        <input type="text" id="username" placeholder="Nome" />
+        <input type="password" id="password" placeholder="Senha" />
+        <button onclick="login()">Acessar</button>
+      </section>
+
+      <!-- HOME -->
+      <section class="section" id="homeSection">
+        <h3>Bem-vindo ao MeuFit!</h3>
+        <p>Seu espaço de treino inteligente 💪</p>
+        <button onclick="openSection('chatSection')">Falar com Didi</button>
+        <button onclick="openSection('treinoSection')">Ver Treinos</button>
+      </section>
+
+      <!-- CHAT -->
+      <section class="section" id="chatSection">
+        <h3>Didi 🤖</h3>
+        <div id="chatBox" class="chat-box"></div>
+        <input type="text" id="userMessage" placeholder="Digite sua pergunta..." />
+        <button onclick="sendMessage()">Enviar</button>
+      </section>
+
+      <!-- TREINO -->
+      <section class="section" id="treinoSection">
+        <h3>🏠 Treino Caseiro</h3>
+        <div class="treino-item" onclick="toggleDone(this)">
+          <h4>⿡ Agachamento com cadeira</h4>
+          <p>3x15 repetições. Use uma cadeira para suporte.</p>
+        </div>
+        <div class="treino-item" onclick="toggleDone(this)">
+          <h4>⿢ Flexão de braço com pano</h4>
+          <p>3x12 repetições. Apoie os joelhos em um pano.</p>
+        </div>
+        <div class="treino-item" onclick="toggleDone(this)">
+          <h4>⿣ Prancha com pano</h4>
+          <p>3x30 segundos. Mantenha corpo reto.</p>
+        </div>
+        <div class="treino-item" onclick="toggleDone(this)">
+          <h4>⿤ Elevação de pernas na cadeira</h4>
+          <p>3x12 repetições. Sente-se na ponta da cadeira.</p>
+        </div>
+        <div class="treino-item" onclick="toggleDone(this)">
+          <h4>⿥ Corrida parada com pano</h4>
+          <p>3x30 segundos. Movimente os pés como se corresse.</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- NAV -->
+    <div class="nav" id="nav">
+      <button onclick="openSection('homeSection')" id="homeBtn">Início</button>
+      <button onclick="openSection('treinoSection')" id="treinoBtn">Treino</button>
+      <button onclick="openSection('chatSection')" id="chatBtn">Didi</button>
+      <button onclick="logout()">Sair</button>
+    </div>
+  </div>
+
+  <script>
+    const sections = {
+      loginSection: document.getElementById('loginSection'),
+      homeSection: document.getElementById('homeSection'),
+      chatSection: document.getElementById('chatSection'),
+      treinoSection: document.getElementById('treinoSection')
+    };
+    const navButtons = {
+      homeSection: document.getElementById('homeBtn'),
+      treinoSection: document.getElementById('treinoBtn'),
+      chatSection: document.getElementById('chatBtn')
+    };
+
+    // Inicialização
+    if (!localStorage.getItem('logged')) {
+      showSection('loginSection');
+      document.getElementById('nav').style.display = 'none';
+    } else {
+      showSection('homeSection');
+    }
+
+    // LOGIN
+    function login() {
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+      if(user && pass) {
+        localStorage.setItem('logged', true);
+        showSection('homeSection');
+        document.getElementById('nav').style.display = 'flex';
+      } else alert('Digite nome e senha para continuar');
+    }
+
+    function logout() {
+      localStorage.removeItem('logged');
+      showSection('loginSection');
+      document.getElementById('nav').style.display = 'none';
+    }
+
+    // Navegação
+    function showSection(id) {
+      for (const sec in sections) sections[sec].style.display = 'none';
+      sections[id].style.display = 'block';
+      for (const btn in navButtons) navButtons[btn].classList.remove('active');
+      if(navButtons[id]) navButtons[id].classList.add('active');
+    }
+    function openSection(id) { showSection(id); }
+
+    // TREINOS
+    function toggleDone(element) { element.classList.toggle('done'); }
+
+    // CHAT
+    function sendMessage() {
+      const input = document.getElementById('userMessage');
+      const chatBox = document.getElementById('chatBox');
+      const text = input.value.trim();
+      if(!text) return;
+
+      const userMsg = document.createElement('div');
+      userMsg.classList.add('message','user');
+      userMsg.textContent = text;
+      chatBox.appendChild(userMsg);
+      input.value='';
+
+      setTimeout(()=>{
+        const botMsg = document.createElement('div');
+        botMsg.classList.add('message','bot');
+        botMsg.textContent = responderDidiProfissional(text);
+        chatBox.appendChild(botMsg);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      },600);
+    }
+
+    function responderDidiProfissional(texto){
+      texto = texto.toLowerCase();
+      if(texto.includes('emagrecer')) return '🏃‍♂ Para emagrecer: 3x/semana cardio + circuito de força em casa. Dica: mantenha déficit calórico e hidratação.';
+      if(texto.includes('força')) return '💪 Para ganhar força: treinos 4x/semana focando grandes grupos musculares. Inclua agachamento, flexão, prancha e levantamento de pernas.';
+      if(texto.includes('resistência')) return '🏋‍♀ Para resistência: treinos intervalados, corrida ou corda, 3-5x/semana, combinando cardio e exercícios de core.';
+      if(texto.includes('alimentação')||texto.includes('dieta')||texto.includes('cardápio')){
+        return '🥗 Sugestão de alimentação:\n- Café: ovos mexidos + frutas\n- Almoço: arroz integral + frango + salada\n- Lanche: iogurte natural ou castanhas\n- Jantar: peixe + legumes cozidos\nBeba 2-3L de água/dia!';
+      }
+      if(texto.includes('motivação')||texto.includes('desistir')) return '🌟 Persistência é a chave! Comece pequeno, evolua diariamente e celebre cada conquista. Você consegue!';
+      if(texto.includes('treino')||texto.includes('exercício')) return '💡 Didi sugere treinos de 20-30min para iniciantes: agachamentos, flexão, prancha, elevação de pernas e corrida estacionária.';
+      return 'Olá! Eu sou a Didi 🤖, sua assistente fitness profissional. Posso criar treinos personalizados, dar dicas de alimentação, motivação e muito mais. Pergunte qualquer coisa!';
+    }
+  </script>
+</body>
+</html>
