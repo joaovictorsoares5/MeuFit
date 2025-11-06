@@ -1,0 +1,165 @@
+MeuFit/
+│
+├─ index.html          ← arquivo principal
+├─ login.html          ← página de login
+├─ home.html           ← página inicial
+├─ chat.html           ← chat com Didi
+├─ treino.html         ← treinos
+├─ style.css           ← todo o CSS
+├─ script.js           ← todo o JavaScript
+└─ assets/             ← imagens, ícones ou sons (opcional)
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MeuFit</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header>MeuFit</header>
+    <main id="mainContent">
+      <!-- Conteúdo será carregado aqui -->
+    </main>
+
+    <!-- NAV -->
+    <div class="nav" id="nav">
+      <button onclick="loadSection('home.html')" id="homeBtn">Início</button>
+      <button onclick="loadSection('treino.html')" id="treinoBtn">Treino</button>
+      <button onclick="loadSection('chat.html')" id="chatBtn">Didi</button>
+      <button onclick="logout()">Sair</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+<section id="loginSection">
+  <h3>Entrar</h3>
+  <input type="text" id="username" placeholder="Nome" />
+  <input type="password" id="password" placeholder="Senha" />
+  <button onclick="login()">Acessar</button>
+</section>
+<section id="homeSection">
+  <h3>Bem-vindo ao MeuFit!</h3>
+  <p>Seu espaço de treino inteligente 💪</p>
+  <button onclick="loadSection('chat.html')">Falar com Didi</button>
+  <button onclick="loadSection('treino.html')">Ver Treinos</button>
+</section>
+<section id="chatSection">
+  <h3>Didi 🤖</h3>
+  <div id="chatBox" class="chat-box"></div>
+  <input type="text" id="userMessage" placeholder="Digite sua pergunta..." />
+  <button onclick="sendMessage()">Enviar</button>
+</section>
+<section id="treinoSection">
+  <h3>🏠 Treino Caseiro</h3>
+  <div class="treino-item" onclick="toggleDone(this)">
+    <h4>1️⃣ Agachamento com cadeira</h4>
+    <p>3x15 repetições. Use uma cadeira para suporte.</p>
+  </div>
+  <div class="treino-item" onclick="toggleDone(this)">
+    <h4>2️⃣ Flexão de braço com pano</h4>
+    <p>3x12 repetições. Apoie os joelhos em um pano.</p>
+  </div>
+  <div class="treino-item" onclick="toggleDone(this)">
+    <h4>3️⃣ Prancha com pano</h4>
+    <p>3x30 segundos. Mantenha corpo reto.</p>
+  </div>
+  <div class="treino-item" onclick="toggleDone(this)">
+    <h4>4️⃣ Elevação de pernas na cadeira</h4>
+    <p>3x12 repetições. Sente-se na ponta da cadeira.</p>
+  </div>
+  <div class="treino-item" onclick="toggleDone(this)">
+    <h4>5️⃣ Corrida parada com pano</h4>
+    <p>3x30 segundos. Movimente os pés como se corresse.</p>
+  </div>
+</section>
+body {margin:0;font-family:Arial,sans-serif;background-color:#f9f9f9;color:#222;display:flex;justify-content:center;align-items:center;height:100vh;}
+.app {width:100%;max-width:420px;height:100vh;display:flex;flex-direction:column;border-radius:15px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,0.2);background-color:#fff;}
+header {text-align:center;padding:1em;background:linear-gradient(90deg,#ff416c,#ff4b2b);color:#fff;font-weight:bold;font-size:1.2em;}
+main {flex:1;padding:1em;overflow-y:auto;}
+input {width:90%;padding:0.7em;margin:0.5em 0;border:1px solid #ccc;border-radius:8px;}
+button {width:95%;padding:0.8em;margin-top:0.5em;background-color:#ff416c;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:bold;}
+button:hover{opacity:0.85;}
+.nav {display:flex;justify-content:space-around;border-top:1px solid #ddd;background-color:#fff;padding:0.5em 0;}
+.nav button {background-color:transparent;color:#555;border:none;font-weight:bold;transition:color 0.3s;}
+.nav button.active {color:#ff416c;}
+.message {margin:0.5em 0;padding:0.7em;border-radius:12px;max-width:80%;word-wrap:break-word;}
+.user {background-color:#ff416c;color:#fff;align-self:flex-end;}
+.bot {background-color:#eee;align-self:flex-start;}
+.chat-box {display:flex;flex-direction:column;max-height:60vh;overflow-y:auto;}
+.treino-item {margin:1em 0;padding:1em;border-radius:10px;background-color:#fff0f2;box-shadow:0 2px 5px rgba(0,0,0,0.1);}
+.treino-item.done {background-color:#d4edda;text-decoration:line-through;}
+h4 {margin-top:0.5em;}
+function loadSection(file) {
+  fetch(file)
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('mainContent').innerHTML = html;
+    });
+}
+
+// LOGIN
+function login() {
+  const user = document.getElementById('username').value;
+  const pass = document.getElementById('password').value;
+  if(user && pass) {
+    localStorage.setItem('logged', true);
+    loadSection('home.html');
+    document.getElementById('nav').style.display = 'flex';
+  } else alert('Digite nome e senha para continuar');
+}
+
+// LOGOUT
+function logout() {
+  localStorage.removeItem('logged');
+  loadSection('login.html');
+  document.getElementById('nav').style.display = 'none';
+}
+
+// Chat Didi
+function sendMessage() {
+  const input = document.getElementById('userMessage');
+  const msg = input.value.trim();
+  if(!msg) return;
+
+  const chatBox = document.getElementById('chatBox');
+
+  const userDiv = document.createElement('div');
+  userDiv.className = 'message user';
+  userDiv.innerText = msg;
+  chatBox.appendChild(userDiv);
+
+  input.value = '';
+  chatBox.scrollTop = chatBox.scrollHeight;
+
+  const botDiv = document.createElement('div');
+  botDiv.className = 'message bot';
+  botDiv.innerText = generateResponse(msg);
+  chatBox.appendChild(botDiv);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function generateResponse(msg) {
+  msg = msg.toLowerCase();
+  if(msg.includes('treino')) return 'Você quer ver seus treinos? Clique em Treino 🏋️';
+  if(msg.includes('forte') || msg.includes('musculo')) return 'Para ganhar músculos, pratique os exercícios regularmente e mantenha alimentação equilibrada.';
+  if(msg.includes('oi') || msg.includes('olá')) return 'Oi! Eu sou a Didi 🤖, sua assistente de treinos!';
+  return 'Desculpe, não entendi. Pode reformular?';
+}
+
+// Marcar treino como feito
+function toggleDone(element) {
+  element.classList.toggle('done');
+}
+
+// Inicialização
+if(!localStorage.getItem('logged')) {
+  loadSection('login.html');
+  document.getElementById('nav').style.display = 'none';
+} else {
+  loadSection('home.html');
+  document.getElementById('nav').style.display = 'flex';
+}
